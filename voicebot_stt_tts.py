@@ -120,17 +120,28 @@ def main():
         st.subheader("질문/답변")
 
         if (audio.duration_seconds > 0) and (st.session_state["check_reset"]==False):
-                    # GPT에게 답변 얻기
-                    response = ask_gpt(st.session_state["messages"], model)
+                # GPT에게 답변 얻기
+                response = ask_gpt(st.session_state["messages"], model)
 
-                    # GPT 모델에 넣을 프롬프트를 위한 질문 내용 저장
-                    st.session_state["messages"] = st.session_state["messages"] + [{"role":"user", "content":question}]
+                # GPT 모델에 넣을 프롬프트를 위한 질문 내용 저장
+                st.session_state["messages"] = st.session_state["messages"] + [{"role":"user", "content":question}]
 
-                    # 채팅 시각화를 위한 답변 내용 저장
-                    now = datetime.now().strftime("%H:%M")
-                    st.session_state["chat"] = st.session_state["chat"] + [("bot", now, response)]
+                # 채팅 시각화를 위한 답변 내용 저장
+                now = datetime.now().strftime("%H:%M")
+                st.session_state["chat"] = st.session_state["chat"] + [("bot", now, response)]
 
+                # 채팅 형식으로 시각화하기
+                for sender, time, message in st.session_state["chat"]:
+                    if sender == "user":
+                        st.write(f'<div style="display:flex;align-items:center;"><div style = "background-color:#007AFF;color:white;border-radius:12px;padding:8px 12px;margin-right:8px;">{message}</div><div style="font-size:0.8rem;color:gray;">{time}</div></div>',unsafe_allow_html=True)
+                        st.write("")
 
+                    else:
+                        st.write(f'<div style="display:flex;align-items:center;justify-content:flex-end;"><div style="background-color:lightgray;border-radius:12px;padding:8px 12px;margin-left:8px;">{message}</div><div style="font-size:0.8rem;color:gray;">{time}</div></div>', 
+                             unsafe_allow_html=True)
+                        st.write("")
+        else:
+            st.session_state["check_reset"] = False
 
 # main() 함수 실행
 if __name__ == "__main__":
