@@ -1,7 +1,20 @@
+# Streamlit 패키지 추가
+# pip install streamlit
+# streamlit 실행 : streamlit run app.py
+
 import streamlit as st
+import openai
+import os
+from dotenv import load_dotenv
+
+# .env 파일 경로 지정
+load_dotenv()
+
+# Open AI의 API 키 설정
+api_key = os.environ.get('OPEN_API_KEY')
+client = openai.OpenAI(api_key=api_key)
 
 #### 메인함수 ####
-
 def main():
     # 기본 설정
     st.set_page_config(
@@ -38,6 +51,18 @@ def main():
             # 리셋 코드
             pass
 
-# 메인함수 실행
-if __name__=="__main__":
+    # 기능 구현 공간
+    col1, col2 = st.columns(2)
+    with col1:
+        # 왼쪽 영역 작성
+        st.subheader("질문하기")
+
+    with col2:
+        # 오른쪽 영역 작성
+        st.subheader("질문/답변")
+
+# main() 함수 실행
+if __name__ == "__main__":
+    # __name__: 파이썬 내장 변수 -> 정해져있는 문법
     main()
+
