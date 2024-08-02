@@ -1,10 +1,6 @@
-# Streamlit 패키지 추가
-# pip install streamlit
-# streamlit 실행 : streamlit run app.py
-
-import streamlit as st
-import openai
 import os
+import streamlit as st          # Streamlit 패키지 추가
+import openai                   # OpenAI 패키지 추가
 from dotenv import load_dotenv
 
 # .env 파일 경로 지정
@@ -39,6 +35,18 @@ def main():
         )
 
         st.markdown("")
+    
+    system_content = "You are a thoungtful assistant. Respond to all input in 25 words and answer in Korea"
+
+    # session state 초기화
+    if "chat" not in st.session_state:
+        st.session_state["chat"] = []
+
+    if "messages" not in st.session_state:
+        st.session_state["messages"] = [{"role":"system", "content":system_content}]
+
+    if "check_rest" not in st.session_state:
+        st.session_state["check_reset"] = False
 
     # 사이드바 생성
     with st.sidebar:
@@ -49,7 +57,10 @@ def main():
 
         if st.button(label="초기화"):
             # 리셋 코드
-            pass
+            st.session_state["chat"]=[]
+            st.session_state["messages"]=[{"role":"system", "content": system_content}]
+            st.session_state["check_reset"]=True
+            
 
     # 기능 구현 공간
     col1, col2 = st.columns(2)
