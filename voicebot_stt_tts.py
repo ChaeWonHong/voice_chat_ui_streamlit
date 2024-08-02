@@ -31,6 +31,14 @@ def STT(speech):
 
     return transcription.text
 
+# ask_gpt 함수 정의
+def ask_gpt(prompt, model):
+     response = client.chat.completions.create(
+          model=model,
+          messages=prompt
+     )
+     return response.choices[0].message.content
+
 ##### 메인함수 #####
 def main():
     # 기본 설정
@@ -89,15 +97,40 @@ def main():
     with col1:
         # 왼쪽 영역 작성
         st.subheader("질문하기")
-
+        # 음성 녹음 아이콘 추가
         audio = audiorecorder()
         if (audio.duration_seconds > 0) and (st.session_state["check_reset"]==False):
             # 음성 재생
             st.audio(audio.export().read())
 
+            # 음원 파일에서 텍스트 추출
+            question = STT(audio)
+
+            # 채팅을 시각화하기 위한 질문 내용 저장
+            now = datetime.now().strftime("%H:%M")
+            st.session_state["chat"] = st.session_state["messages"] + [{"role":"user", "content": question}]
+
+            # GPT 모델에 넣을 프롬프트를 위한 질문 내용 저장
+            st.session_state["messages"] = st.session_state["messages"] + [{"role":"user", "content":question}]
+
+
     with col2:
+
         # 오른쪽 영역 작성
         st.subheader("질문/답변")
+
+        if (audio.duration_seconds > 0) and (st.session_state["check_reset"]==False):
+                    # GPT에게 답변 얻기
+                    response = ask_gpt(st.session_state["messages"], model)
+
+                    # GPT 모델에 넣을 프롬프트를 위한 질문 내용 저장
+                    st.session_state["messages"] = st.session_state["messages"] + [{"role":"user", "content":question}]
+
+                    # 채팅 시각화를 위한 답변 내용 저장
+                    now = datetime.now().strftime("%H:%M")
+                    st.session_state["chat"] = st.session_state["chat"] + [("bot", now, response)]
+
+
 
 # main() 함수 실행
 if __name__ == "__main__":
