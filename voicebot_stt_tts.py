@@ -1,8 +1,9 @@
 import os
-import streamlit as st          # Streamlit 패키지 추가
-import openai                   # OpenAI 패키지 추가
+import streamlit as st                      # Streamlit 패키지 추가
+import openai                               # OpenAI 패키지 추가
 from dotenv import load_dotenv
-from audiorecorder import audiorecorder # audiorecorder 패키지 추가 :  Streamlit 애플리케이션에서 오디오를 녹음할 수 있는 컴포넌트를 제공
+from audiorecorder import audiorecorder     # audiorecorder 패키지 추가 :  Streamlit 애플리케이션에서 오디오를 녹음할 수 있는 컴포넌트를 제공
+from datetime import datetime               # 시간정보 패키지 추가
 
 # .env 파일 경로 지정
 load_dotenv()
@@ -11,7 +12,26 @@ load_dotenv()
 api_key = os.environ.get('OPEN_API_KEY')
 client = openai.OpenAI(api_key=api_key)
 
-#### 메인함수 ####
+##### 기능 구현 함수 #####
+def STT(speech):
+    # 파일 저장
+    filename = 'input.mp3'
+    speech.export(filename, format = "mp3")
+
+    # 음원 파일 열기
+    with open(filename, "rb") as audio_file:
+        # Whisper 모델을 활용해 텍스트 얻기
+        transcription = client.audio.transcriptions.create(
+            model="whisper-1",
+            file=audio_file
+        )
+
+    # 파일 삭제
+    os.remove(filename)
+
+    return transcription.text
+
+##### 메인함수 #####
 def main():
     # 기본 설정
     st.set_page_config(
@@ -56,6 +76,7 @@ def main():
         model = st.radio(label="GPT모델", options=["gpt-3.5-turbo", "gpt-4o", "gpt-4-turbo"])
         st.markdown("---")
 
+        # 리셋 버튼 생성
         if st.button(label="초기화"):
             # 리셋 코드
             st.session_state["chat"]=[]
