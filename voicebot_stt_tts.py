@@ -2,6 +2,7 @@ import os
 import streamlit as st          # Streamlit 패키지 추가
 import openai                   # OpenAI 패키지 추가
 from dotenv import load_dotenv
+from audiorecorder import audiorecorder # audiorecorder 패키지 추가 :  Streamlit 애플리케이션에서 오디오를 녹음할 수 있는 컴포넌트를 제공
 
 # .env 파일 경로 지정
 load_dotenv()
@@ -68,6 +69,11 @@ def main():
         # 왼쪽 영역 작성
         st.subheader("질문하기")
 
+        audio = audiorecorder()
+        if (audio.duration_seconds > 0) and (st.session_state["check_reset"]==False):
+            # 음성 재생
+            st.audio(audio.export().read())
+
     with col2:
         # 오른쪽 영역 작성
         st.subheader("질문/답변")
@@ -76,4 +82,3 @@ def main():
 if __name__ == "__main__":
     # __name__: 파이썬 내장 변수 -> 정해져있는 문법
     main()
-
